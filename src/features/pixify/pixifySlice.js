@@ -28,6 +28,8 @@ const initialState = {
     likedBy: null,
     likedByLoggedInUser: false,
   },
+  likedPosts: [],
+  postedPosts: [],
   isError: false,
   message: "",
 };
@@ -96,11 +98,17 @@ export const onPost = createAsyncThunk(
       const snapshot = await uploadBytes(storageRef, file);
       const url = await getDownloadURL(snapshot.ref);
 
-      await addDoc(collection(db, "posts"), {
+      const docRefPosts = await addDoc(collection(db, "posts"), {
         userId: userId,
         imageUrl: url,
         title: title,
         likedBy: [],
+      });
+
+      const docRefUsers = doc(db, "users", userId);
+      const docSnapUsers = await getDoc(docRefUsers);
+      await updateDoc(docRefUsers, {
+        postedPosts: [...docSnapUsers.data().postedPosts, docRefPosts.id],
       });
     } catch (error) {
       return thunkAPI.rejectWithValue(error.message);
@@ -169,6 +177,48 @@ export const onUnlike = createAsyncThunk(
   }
 );
 
+export const getLikedPosts = createAsyncThunk(
+  "pixify/getLikedPosts",
+  async ({ userId }, thunkAPI) => {
+    try {
+      let docRef = await doc(db, "users", userId);
+      let docSnap = await getDoc(docRef);
+      const myPostsIds = docSnap.data().likedPosts;
+
+      let data = [];
+      for (const id of myPostsIds) {
+        docRef = await doc(db, "posts", id);
+        docSnap = await getDoc(docRef);
+        data.push({ id: docSnap.id, ...docSnap.data() });
+      }
+      return data;
+    } catch (error) {
+      thunkAPI.rejectWithValue(error.message);
+    }
+  }
+);
+
+export const getPostedPosts = createAsyncThunk(
+  "pixify/getPostedPosts",
+  async ({ userId }, thunkAPI) => {
+    try {
+      let docRef = await doc(db, "users", userId);
+      let docSnap = await getDoc(docRef);
+      const myPostsIds = docSnap.data().postedPosts;
+
+      let data = [];
+      for (const id of myPostsIds) {
+        docRef = await doc(db, "posts", id);
+        docSnap = await getDoc(docRef);
+        data.push({ id: docSnap.id, ...docSnap.data() });
+      }
+      return data;
+    } catch (error) {
+      thunkAPI.rejectWithValue(error.message);
+    }
+  }
+);
+
 const pixifySlice = createSlice({
   name: "pixifySlice",
   initialState,
@@ -204,6 +254,8 @@ const pixifySlice = createSlice({
       state.userName = null;
       state.userId = null;
       state.displayData = [];
+      state.likedPosts = [];
+      state.postedPosts = [];
       state.message = "Logged out";
       localStorage.removeItem("userName");
       localStorage.removeItem("userId");
@@ -256,6 +308,26 @@ const pixifySlice = createSlice({
 
     [onUnlike.fulfilled]: (state) => {
       state.isError = false;
+    },
+
+    [getLikedPosts.fulfilled]: (state, { payload }) => {
+      state.likedPosts = payload;
+      state.message = "";
+      state.isError = false;
+    },
+    [getLikedPosts.rejected]: (state, { payload }) => {
+      state.message = payload;
+      state.isError = true;
+    },
+
+    [getPostedPosts.fulfilled]: (state, { payload }) => {
+      state.postedPosts = payload;
+      state.message = "";
+      state.isError = false;
+    },
+    [getPostedPosts.rejected]: (state, { payload }) => {
+      state.message = payload;
+      state.isError = true;
     },
   },
 });

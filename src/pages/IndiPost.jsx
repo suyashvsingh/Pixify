@@ -64,7 +64,7 @@ const IndiPost = () => {
     return (
       <section className="w-full">
         <div className="p-8">
-          <div className="max-w-[500px] m-auto">
+          <div className="max-w-[400px] m-auto">
             <div className="w-full flex items-center justify-center">
               <ClipLoader loading={loading} size={50} color="white" />
             </div>
@@ -76,7 +76,7 @@ const IndiPost = () => {
     return (
       <section className="w-full">
         <div className="p-8">
-          <div className="max-w-[500px] m-auto">
+          <div className="max-w-[400px] m-auto">
             <div className="flex flex-col w-full">
               <div className="m-auto w-full">
                 <img
