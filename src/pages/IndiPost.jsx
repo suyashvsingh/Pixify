@@ -48,17 +48,12 @@ const IndiPost = () => {
   };
 
   useEffect(() => {
-    if (!isLoggedIn) {
-      navigate("/login");
-      return;
-    }
-
     setLoading(true);
     fetchIndiPost();
     return () => {
       dispatch(resetCurrPost());
     };
-  }, [isLoggedIn, navigate, dispatch, id]);
+  }, [isLoggedIn, dispatch, id]);
 
   if (loading) {
     return (

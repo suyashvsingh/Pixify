@@ -9,4 +9,7 @@ export default defineConfig({
       this: "window",
     },
   },
+  server: {
+    host: true,
+  },
 });

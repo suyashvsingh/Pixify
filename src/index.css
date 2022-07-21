@@ -7,6 +7,9 @@
     @apply font-[poppins];
     @apply text-gray-300;
   }
+  li {
+    @apply p-1 pl-0 font-normal text-base;
+  }
 }
 
 input,

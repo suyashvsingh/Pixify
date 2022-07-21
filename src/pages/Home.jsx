@@ -1,22 +1,15 @@
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
 import { fetchData } from "../features/pixify/pixifySlice";
 import Card from "../components/Card";
 
 const Home = () => {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
   const { isLoggedIn, displayData } = useSelector((store) => store.pixify);
 
   useEffect(() => {
-    if (!isLoggedIn) {
-      navigate("/login");
-      return;
-    }
-
     dispatch(fetchData());
-  }, [isLoggedIn, navigate, dispatch]);
+  }, [isLoggedIn, dispatch]);
 
   if (displayData.length === 0) {
     return (

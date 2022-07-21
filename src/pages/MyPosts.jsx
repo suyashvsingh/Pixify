@@ -2,16 +2,12 @@ import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { getPostedPosts } from "../features/pixify/pixifySlice";
 import ClipLoader from "react-spinners/ClipLoader";
-import { useNavigate } from "react-router-dom";
 import Card from "../components/Card";
 
 const MyPosts = () => {
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { isLoggedIn, userId, postedPosts } = useSelector(
-    (store) => store.pixify
-  );
+  const { userId, postedPosts } = useSelector((store) => store.pixify);
 
   const fetchPostedPosts = async () => {
     setLoading(true);
@@ -20,17 +16,12 @@ const MyPosts = () => {
   };
 
   useEffect(() => {
-    if (!isLoggedIn) {
-      navigate("/login");
-      return;
-    }
-
     const fetch = async () => {
       await fetchPostedPosts();
     };
 
     fetch();
-  }, [isLoggedIn, navigate]);
+  }, []);
 
   if (loading) {
     return (
@@ -48,37 +39,25 @@ const MyPosts = () => {
 
   if (postedPosts.length === 0) {
     return (
-      <>
-        <section className="w-full">
-          <div className="p-8">
-            <div className="w-full m-auto max-w-[700px]">
-              <div>
-                <input
-                  type="text"
-                  placeholder="Search pictures"
-                  className="w-full text-sm p-4 rounded-full bg-gradient-to-r from-gray-800 to-slate-900"
-                />
-              </div>
+      <section className="w-full">
+        <div className="p-8">
+          <div className="m-auto max-w-[1000px]">
+            <div className="flex items-center justify-center">
+              <div className="text-xl font-bold">You haven't posted Yet</div>
             </div>
           </div>
-        </section>
-        <section className="w-full">
-          <div className="p-8">
-            <div className="m-auto max-w-[1000px]">
-              <div className="flex items-center justify-center">
-                <div className="text-xl font-bold">You haven't posted Yet</div>
-              </div>
-            </div>
-          </div>
-        </section>
-      </>
+        </div>
+      </section>
     );
   }
 
   return (
     <section className="w-full">
-      <div className="p-8">
+      <div className="p-8 pt-2">
         <div className="m-auto max-w-[1000px] ">
+          <div className="mb-8">
+            <p className="font-bold text-xl">My posts</p>
+          </div>
           <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4">
             {postedPosts.map((post) => {
               return <Card {...post} key={post.id} />;

@@ -16,7 +16,7 @@ const Header = () => {
 
   return (
     <section className="w-full">
-      <div className="p-8 pb-0 md:pb-4 xl:pb-8 pt-4 xl:pt-8">
+      <div className="p-8">
         <div className="m-auto max-w-[1000px] ">
           <div className="w-full grid grid-cols-2">
             <Link to="/">
@@ -33,12 +33,14 @@ const Header = () => {
               <div className="ml-5 md:ml-8  cursor-pointer hover:scale-90 duration-300">
                 <FaSignOutAlt size={20} onClick={handleOnClickSignOut} />
               </div>
-              <div className="ml-5 md:ml-8  cursor-pointer hover:scale-90 duration-300">
-                <FaUser size={20} />
-              </div>
+              <Link to="/account">
+                <div className="ml-5 md:ml-8  cursor-pointer hover:scale-90 duration-300">
+                  <FaUser size={20} />
+                </div>
+              </Link>
             </div>
             <div className="flex justify-start items-end">
-              <div className="font-semibold text-sm md:text-xl mt-2">{`Hi, ${userName}!`}</div>
+              <div className="font-semibold text-sm md:text-md mt-2">{`Hi, ${userName}!`}</div>
             </div>
           </div>
         </div>

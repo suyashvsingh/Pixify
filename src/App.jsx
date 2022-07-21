@@ -9,6 +9,8 @@ import toast from "react-hot-toast";
 import IndiPost from "./pages/IndiPost";
 import LikedPosts from "./pages/LikedPosts";
 import MyPosts from "./pages/MyPosts";
+import Account from "./pages/Account";
+import ProtectedRoute from "./pages/ProtectedRoute";
 
 const App = () => {
   const { isLoggedIn, isError, message } = useSelector((store) => store.pixify);
@@ -30,11 +32,54 @@ const App = () => {
       {isLoggedIn && <Header />}
       <Routes>
         <Route path="/login" element={<Login />} />
-        <Route path="/" element={<Home />} />
-        <Route path="/createpost" element={<CreatePost />} />
-        <Route path="/post/:id" element={<IndiPost />} />
-        <Route path="/likedposts" element={<LikedPosts />} />
-        <Route path="/myposts" element={<MyPosts />} />
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <Home />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/createpost"
+          element={
+            <ProtectedRoute>
+              <CreatePost />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/post/:id"
+          element={
+            <ProtectedRoute>
+              <IndiPost />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/likedposts"
+          element={
+            <ProtectedRoute>
+              <LikedPosts />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/myposts"
+          element={
+            <ProtectedRoute>
+              <MyPosts />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/account"
+          element={
+            <ProtectedRoute>
+              <Account />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </div>
   );

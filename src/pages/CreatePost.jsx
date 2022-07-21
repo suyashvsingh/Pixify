@@ -10,13 +10,7 @@ const CreatePost = () => {
   const [title, setTitle] = useState("");
   const [file, setFile] = useState(null);
   const navigate = useNavigate();
-  const { isLoggedIn, userName, userId } = useSelector((store) => store.pixify);
-
-  useEffect(() => {
-    if (!isLoggedIn) {
-      navigate("/login");
-    }
-  }, [isLoggedIn, navigate]);
+  const { userName, userId } = useSelector((store) => store.pixify);
 
   const onClickPost = async () => {
     try {
