@@ -135,7 +135,7 @@ export const onLike = createAsyncThunk(
     try {
       let docRef = doc(db, "posts", id);
       let docSnap = await getDoc(docRef);
-      if (!docSnap.data().likedBy.includes(userId)) {
+      if (!(await docSnap.data().likedBy.includes(userId))) {
         await updateDoc(docRef, {
           likedBy: [...docSnap.data().likedBy, userId],
         });
@@ -286,8 +286,7 @@ const pixifySlice = createSlice({
     },
 
     [getIndiPost.fulfilled]: (state, { payload }) => {
-      const { userId } = payload;
-      payload.likedBy.includes(userId)
+      payload.likedBy.includes(state.userId)
         ? (state.currentPost.likedByLoggedInUser = true)
         : (state.currentPost.likedByLoggedInUser = false);
 
