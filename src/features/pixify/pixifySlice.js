@@ -27,6 +27,7 @@ const initialState = {
     userId: null,
     likedBy: null,
     likedByLoggedInUser: false,
+    userName: null,
   },
   likedPosts: [],
   postedPosts: [],
@@ -219,6 +220,19 @@ export const getPostedPosts = createAsyncThunk(
   }
 );
 
+export const getUserNameFromUserId = createAsyncThunk(
+  "pixify/getUserNameFromUserId",
+  async ({ userId }, thunkAPI) => {
+    try {
+      const docRef = doc(db, "users", userId);
+      const docSnap = await getDoc(docRef);
+      return await docSnap.data().userName.split(" ")[0];
+    } catch (error) {
+      thunkAPI.rejectWithValue(error.message);
+    }
+  }
+);
+
 const pixifySlice = createSlice({
   name: "pixifySlice",
   initialState,
@@ -325,6 +339,14 @@ const pixifySlice = createSlice({
       state.isError = false;
     },
     [getPostedPosts.rejected]: (state, { payload }) => {
+      state.message = payload;
+      state.isError = true;
+    },
+
+    [getUserNameFromUserId.fulfilled]: (state, { payload }) => {
+      state.currentPost.userName = payload;
+    },
+    [getUserNameFromUserId.rejected]: (state, { payload }) => {
       state.message = payload;
       state.isError = true;
     },

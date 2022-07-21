@@ -6,6 +6,7 @@ import {
   onUnlike,
   onLike,
   resetCurrPost,
+  getUserNameFromUserId,
 } from "../features/pixify/pixifySlice";
 import ClipLoader from "react-spinners/ClipLoader";
 import { FaHeart } from "react-icons/fa";
@@ -14,27 +15,33 @@ import { doc, getDoc } from "firebase/firestore";
 
 const IndiPost = () => {
   const [loading, setLoading] = useState(true);
-  const [userName, setUserName] = useState("");
+  // const [userName, setUserName] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { currentPost, isLoggedIn, userId } = useSelector(
     (store) => store.pixify
   );
+  const { userName } = currentPost;
   const { id } = useParams();
 
-  const getUserNameFromUserId = async () => {
-    const docRef = await doc(db, "users", userId);
-    const docSnap = await getDoc(docRef);
-    setUserName(await docSnap.data().userName.split(" ")[0]);
-  };
+  // const getUserNameFromUserId = async (userId) => {
+  //   const docRef = await doc(db, "users", userId);
+  //   const docSnap = await getDoc(docRef);
+  //   setUserName(await docSnap.data().userName.split(" ")[0]);
+  // };
 
   const fetchIndiPost = async () => {
-    const response = await dispatch(getIndiPost(id));
-    await getUserNameFromUserId();
-    setLoading(false);
+    let response = await dispatch(getIndiPost(id));
     if (response.error) {
       navigate("/");
     }
+    response = await dispatch(
+      getUserNameFromUserId({ userId: response.payload.userId })
+    );
+    if (response.error) {
+      navigate("/");
+    }
+    setLoading(false);
   };
 
   const handleOnClickLike = async () => {
