@@ -1,17 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { onPost } from "../features/pixify/pixifySlice";
 import ClipLoader from "react-spinners/ClipLoader";
 
 const CreatePost = () => {
-  const [loading, setLoading] = useState();
+  const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
   const [title, setTitle] = useState("");
   const [file, setFile] = useState(null);
   const navigate = useNavigate();
   const { userName, userId } = useSelector((store) => store.pixify);
-
   const onClickPost = async () => {
     try {
       setLoading(true);

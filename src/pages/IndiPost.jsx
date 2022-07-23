@@ -9,7 +9,7 @@ import {
   getUserNameFromUserId,
 } from "../features/pixify/pixifySlice";
 import ClipLoader from "react-spinners/ClipLoader";
-import { FaHeart } from "react-icons/fa";
+import { FaHeart, FaTrash } from "react-icons/fa";
 
 const IndiPost = () => {
   const [loading, setLoading] = useState(true);
@@ -18,7 +18,7 @@ const IndiPost = () => {
   const { currentPost, isLoggedIn, userId } = useSelector(
     (store) => store.pixify
   );
-  const { userName } = currentPost;
+  const { postUserName } = currentPost;
   const { id } = useParams();
   const fetchIndiPost = async () => {
     let response = await dispatch(getIndiPost(id));
@@ -26,7 +26,7 @@ const IndiPost = () => {
       navigate("/");
     }
     response = await dispatch(
-      getUserNameFromUserId({ userId: response.payload.userId })
+      getUserNameFromUserId({ userId: response.payload.postUserId })
     );
     if (response.error) {
       navigate("/");
@@ -96,9 +96,12 @@ const IndiPost = () => {
                       )}
                     </div>
                     <div className="ml-2 w-2">{currentPost.likedBy.length}</div>
+                    {currentPost.postUserId == userId ? (
+                      <FaTrash className="ml-4" />
+                    ) : null}
                   </div>
                 </div>
-                {userName}
+                {postUserName}
               </div>
             </div>
           </div>

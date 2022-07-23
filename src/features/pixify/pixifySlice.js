@@ -24,10 +24,10 @@ const initialState = {
   currentPost: {
     imageUrl: null,
     title: null,
-    userId: null,
+    postUserId: null,
+    postUserName: null,
     likedBy: null,
     likedByLoggedInUser: false,
-    userName: null,
   },
   likedPosts: [],
   postedPosts: [],
@@ -80,7 +80,7 @@ export const fetchData = createAsyncThunk(
 
 export const onPost = createAsyncThunk(
   "pixify/onPost",
-  async ({ file, title, userName, userId }, thunkAPI) => {
+  async ({ file, title, userId }, thunkAPI) => {
     if (file === null) {
       return thunkAPI.rejectWithValue("Select an image");
     }
@@ -100,7 +100,7 @@ export const onPost = createAsyncThunk(
       const url = await getDownloadURL(snapshot.ref);
 
       const docRefPosts = await addDoc(collection(db, "posts"), {
-        userId: userId,
+        postUserId: userId,
         imageUrl: url,
         title: title,
         likedBy: [],
@@ -240,7 +240,7 @@ const pixifySlice = createSlice({
     resetCurrPost: (state) => {
       state.currentPost.imageUrl = null;
       state.currentPost.title = null;
-      state.currentPost.userId = null;
+      state.currentPost.postUserId = null;
       state.currentPost.likedBy = null;
       state.currentPost.likedByLoggedInUser = false;
     },
@@ -258,7 +258,7 @@ const pixifySlice = createSlice({
       state.isError = false;
       state.message = `Welcome ${state.userName}`;
     },
-    [onLogin.pending]: (state, action) => {
+    [onLogin.pending]: (state) => {
       state.isError = false;
       state.message = "";
     },
@@ -279,7 +279,7 @@ const pixifySlice = createSlice({
       localStorage.removeItem("userId");
       state.isError = false;
     },
-    [onLogout.pending]: (state, action) => {
+    [onLogout.pending]: (state) => {
       state.isError = false;
       state.message = "";
     },
@@ -293,7 +293,7 @@ const pixifySlice = createSlice({
       state.message = "";
       state.isError = false;
     },
-    [fetchData.pending]: (state, action) => {
+    [fetchData.pending]: (state) => {
       state.isError = false;
       state.message = "";
     },
@@ -306,7 +306,7 @@ const pixifySlice = createSlice({
       state.isError = false;
       state.message = "Post successfull";
     },
-    [onPost.pending]: (state, action) => {
+    [onPost.pending]: (state) => {
       state.isError = false;
       state.message = "";
     },
@@ -323,10 +323,10 @@ const pixifySlice = createSlice({
       state.isError = false;
       state.currentPost.imageUrl = payload.imageUrl;
       state.currentPost.title = payload.title;
-      state.currentPost.userId = payload.userId;
+      state.currentPost.postUserId = payload.postUserId;
       state.currentPost.likedBy = payload.likedBy;
     },
-    [getIndiPost.pending]: (state, action) => {
+    [getIndiPost.pending]: (state) => {
       state.isError = false;
       state.message = "";
     },
@@ -348,7 +348,7 @@ const pixifySlice = createSlice({
       state.message = "";
       state.isError = false;
     },
-    [getLikedPosts.pending]: (state, action) => {
+    [getLikedPosts.pending]: (state) => {
       state.isError = false;
       state.message = "";
     },
@@ -362,7 +362,7 @@ const pixifySlice = createSlice({
       state.message = "";
       state.isError = false;
     },
-    [getPostedPosts.pending]: (state, action) => {
+    [getPostedPosts.pending]: (state) => {
       state.isError = false;
       state.message = "";
     },
@@ -372,9 +372,9 @@ const pixifySlice = createSlice({
     },
 
     [getUserNameFromUserId.fulfilled]: (state, { payload }) => {
-      state.currentPost.userName = payload;
+      state.currentPost.postUserName = payload;
     },
-    [getUserNameFromUserId.pending]: (state, action) => {
+    [getUserNameFromUserId.pending]: (state) => {
       state.isError = false;
       state.message = "";
     },
