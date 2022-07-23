@@ -7,6 +7,7 @@ import {
   onLike,
   resetCurrPost,
   getUserNameFromUserId,
+  deletePost,
 } from "../features/pixify/pixifySlice";
 import ClipLoader from "react-spinners/ClipLoader";
 import { FaHeart, FaTrash } from "react-icons/fa";
@@ -15,12 +16,11 @@ const IndiPost = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { currentPost, isLoggedIn, userId } = useSelector(
-    (store) => store.pixify
-  );
+  const { currentPost, userId } = useSelector((store) => store.pixify);
   const { postUserName } = currentPost;
   const { id } = useParams();
   const fetchIndiPost = async () => {
+    setLoading(true);
     let response = await dispatch(getIndiPost(id));
     if (response.error) {
       navigate("/");
@@ -44,13 +44,19 @@ const IndiPost = () => {
     fetchIndiPost({ userId });
   };
 
+  const handleOnClickDelete = async () => {
+    const response = await dispatch(deletePost({ id }));
+    setLoading(false);
+    navigate("/myposts");
+  };
+
   useEffect(() => {
     setLoading(true);
     fetchIndiPost();
     return () => {
       dispatch(resetCurrPost());
     };
-  }, [isLoggedIn, dispatch, id]);
+  }, [dispatch, id]);
 
   if (loading) {
     return (
@@ -81,23 +87,21 @@ const IndiPost = () => {
                 <div className="flex items-center justify-between w-full">
                   <div className="font-bold text-2xl">{currentPost.title}</div>
                   <div className="flex items-center justify-center">
-                    <div className="fa-icon-heart-div hover:scale-105 duration-300 cursor-pointer">
+                    <div className="hover:scale-105 duration-300 cursor-pointer">
                       {currentPost.likedByLoggedInUser ? (
                         <FaHeart
-                          className="fa-icon-heart"
                           color="red"
                           onClick={(id) => handleOnClickUnlike(id)}
                         />
                       ) : (
-                        <FaHeart
-                          className="fa-icon-heart"
-                          onClick={(id) => handleOnClickLike(id)}
-                        />
+                        <FaHeart onClick={(id) => handleOnClickLike(id)} />
                       )}
                     </div>
                     <div className="ml-2 w-2">{currentPost.likedBy.length}</div>
                     {currentPost.postUserId == userId ? (
-                      <FaTrash className="ml-4" />
+                      <div className="ml-4 hover:scale-105 duration-300 cursor-pointer">
+                        <FaTrash onClick={handleOnClickDelete} />
+                      </div>
                     ) : null}
                   </div>
                 </div>

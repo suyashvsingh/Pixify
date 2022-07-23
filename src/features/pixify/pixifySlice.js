@@ -1,7 +1,12 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { signInWithPopup, signOut, getAdditionalUserInfo } from "firebase/auth";
 import { auth, provider, db, storage } from "../../firebase";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import {
+  ref,
+  uploadBytes,
+  getDownloadURL,
+  deleteObject,
+} from "firebase/storage";
 import {
   collection,
   addDoc,
@@ -10,6 +15,7 @@ import {
   getDoc,
   doc,
   updateDoc,
+  deleteDoc,
 } from "firebase/firestore";
 import { v4 } from "uuid";
 
@@ -185,12 +191,13 @@ export const getLikedPosts = createAsyncThunk(
       let docRef = await doc(db, "users", userId);
       let docSnap = await getDoc(docRef);
       const myPostsIds = docSnap.data().likedPosts;
-
       let data = [];
       for (const id of myPostsIds) {
         docRef = await doc(db, "posts", id);
         docSnap = await getDoc(docRef);
-        data.push({ id: docSnap.id, ...docSnap.data() });
+        if (docSnap.data() !== undefined) {
+          data.push({ id: docSnap.id, ...docSnap.data() });
+        }
       }
       return data;
     } catch (error) {
@@ -211,7 +218,9 @@ export const getPostedPosts = createAsyncThunk(
       for (const id of myPostsIds) {
         docRef = await doc(db, "posts", id);
         docSnap = await getDoc(docRef);
-        data.push({ id: docSnap.id, ...docSnap.data() });
+        if (docSnap.data() !== undefined) {
+          data.push({ id: docSnap.id, ...docSnap.data() });
+        }
       }
       return data;
     } catch (error) {
@@ -229,6 +238,22 @@ export const getUserNameFromUserId = createAsyncThunk(
       return await docSnap.data().userName.split(" ")[0];
     } catch (error) {
       thunkAPI.rejectWithValue(error.message);
+    }
+  }
+);
+
+export const deletePost = createAsyncThunk(
+  "pixify/deletePost",
+  async ({ id }, thunkAPI) => {
+    try {
+      const docRef = doc(db, "posts", id);
+      const data = (await getDoc(docRef)).data();
+      const { imageUrl } = data;
+      const httpsReference = ref(storage, imageUrl);
+      deleteDoc(docRef);
+      deleteObject(httpsReference);
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.message);
     }
   }
 );
@@ -379,6 +404,19 @@ const pixifySlice = createSlice({
       state.message = "";
     },
     [getUserNameFromUserId.rejected]: (state, { payload }) => {
+      state.message = payload;
+      state.isError = true;
+    },
+
+    [deletePost.fulfilled]: (state, { payload }) => {
+      state.isError = false;
+      state.message = "Post deleted";
+    },
+    [deletePost.pending]: (state) => {
+      state.isError = false;
+      state.message = "";
+    },
+    [deletePost.rejected]: (state, { payload }) => {
       state.message = payload;
       state.isError = true;
     },
