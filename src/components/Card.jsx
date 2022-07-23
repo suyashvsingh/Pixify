@@ -1,21 +1,16 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { db } from "../firebase";
-import { getDoc, doc } from "firebase/firestore";
+import { useDispatch, useSelector } from "react-redux";
+import { getUserNameFromUserId } from "../features/pixify/pixifySlice";
 
 const Card = ({ userId, imageUrl, title, id }) => {
-  const [userName, setUserName] = useState("");
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-
-  const getUserNameFromUserId = async () => {
-    const docRef = await doc(db, "users", userId);
-    const docSnap = await getDoc(docRef);
-    setUserName(await docSnap.data().userName.split(" ")[0]);
-  };
+  const { userName } = useSelector((store) => store.pixify).currentPost;
 
   useEffect(() => {
-    getUserNameFromUserId();
-  }, []);
+    dispatch(getUserNameFromUserId({ userId }));
+  }, [dispatch]);
 
   return (
     <div>

@@ -19,11 +19,12 @@ const CreatePost = () => {
       if (!res.error) {
         setLoading(false);
         navigate("/");
+      } else {
+        setLoading(false);
       }
     } catch (error) {
       setLoading(false);
     }
-
     setTitle("");
     setFile(null);
   };

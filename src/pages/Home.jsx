@@ -5,11 +5,11 @@ import Card from "../components/Card";
 
 const Home = () => {
   const dispatch = useDispatch();
-  const { isLoggedIn, displayData } = useSelector((store) => store.pixify);
+  const { displayData } = useSelector((store) => store.pixify);
 
   useEffect(() => {
     dispatch(fetchData());
-  }, [isLoggedIn, dispatch]);
+  }, [dispatch]);
 
   if (displayData.length === 0) {
     return (

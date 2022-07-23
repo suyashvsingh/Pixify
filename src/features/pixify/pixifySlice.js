@@ -85,12 +85,12 @@ export const onPost = createAsyncThunk(
       return thunkAPI.rejectWithValue("Select an image");
     }
 
-    if (!title) {
-      return thunkAPI.rejectWithValue("Add a title");
-    }
-
     if (file["type"].split("/")[0] !== "image") {
       return thunkAPI.rejectWithValue("Selected file is not an image");
+    }
+
+    if (!title) {
+      return thunkAPI.rejectWithValue("Add a title");
     }
 
     try {
@@ -258,6 +258,10 @@ const pixifySlice = createSlice({
       state.isError = false;
       state.message = `Welcome ${state.userName}`;
     },
+    [onLogin.pending]: (state, action) => {
+      state.isError = false;
+      state.message = "";
+    },
     [onLogin.rejected]: (state, { payload }) => {
       state.isError = true;
       state.message = payload;
@@ -275,6 +279,10 @@ const pixifySlice = createSlice({
       localStorage.removeItem("userId");
       state.isError = false;
     },
+    [onLogout.pending]: (state, action) => {
+      state.isError = false;
+      state.message = "";
+    },
     [onLogout.rejected]: (state, { payload }) => {
       state.isError = true;
       state.message = payload;
@@ -285,6 +293,10 @@ const pixifySlice = createSlice({
       state.message = "";
       state.isError = false;
     },
+    [fetchData.pending]: (state, action) => {
+      state.isError = false;
+      state.message = "";
+    },
     [fetchData.rejected]: (state, { payload }) => {
       state.isError = true;
       state.message = payload;
@@ -293,6 +305,10 @@ const pixifySlice = createSlice({
     [onPost.fulfilled]: (state) => {
       state.isError = false;
       state.message = "Post successfull";
+    },
+    [onPost.pending]: (state, action) => {
+      state.isError = false;
+      state.message = "";
     },
     [onPost.rejected]: (state, { payload }) => {
       state.isError = true;
@@ -309,6 +325,10 @@ const pixifySlice = createSlice({
       state.currentPost.title = payload.title;
       state.currentPost.userId = payload.userId;
       state.currentPost.likedBy = payload.likedBy;
+    },
+    [getIndiPost.pending]: (state, action) => {
+      state.isError = false;
+      state.message = "";
     },
     [getIndiPost.rejected]: (state, { payload }) => {
       state.message = payload;
@@ -328,6 +348,10 @@ const pixifySlice = createSlice({
       state.message = "";
       state.isError = false;
     },
+    [getLikedPosts.pending]: (state, action) => {
+      state.isError = false;
+      state.message = "";
+    },
     [getLikedPosts.rejected]: (state, { payload }) => {
       state.message = payload;
       state.isError = true;
@@ -338,6 +362,10 @@ const pixifySlice = createSlice({
       state.message = "";
       state.isError = false;
     },
+    [getPostedPosts.pending]: (state, action) => {
+      state.isError = false;
+      state.message = "";
+    },
     [getPostedPosts.rejected]: (state, { payload }) => {
       state.message = payload;
       state.isError = true;
@@ -345,6 +373,10 @@ const pixifySlice = createSlice({
 
     [getUserNameFromUserId.fulfilled]: (state, { payload }) => {
       state.currentPost.userName = payload;
+    },
+    [getUserNameFromUserId.pending]: (state, action) => {
+      state.isError = false;
+      state.message = "";
     },
     [getUserNameFromUserId.rejected]: (state, { payload }) => {
       state.message = payload;

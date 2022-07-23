@@ -10,12 +10,9 @@ import {
 } from "../features/pixify/pixifySlice";
 import ClipLoader from "react-spinners/ClipLoader";
 import { FaHeart } from "react-icons/fa";
-import { db } from "../firebase";
-import { doc, getDoc } from "firebase/firestore";
 
 const IndiPost = () => {
   const [loading, setLoading] = useState(true);
-  // const [userName, setUserName] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { currentPost, isLoggedIn, userId } = useSelector(
@@ -23,13 +20,6 @@ const IndiPost = () => {
   );
   const { userName } = currentPost;
   const { id } = useParams();
-
-  // const getUserNameFromUserId = async (userId) => {
-  //   const docRef = await doc(db, "users", userId);
-  //   const docSnap = await getDoc(docRef);
-  //   setUserName(await docSnap.data().userName.split(" ")[0]);
-  // };
-
   const fetchIndiPost = async () => {
     let response = await dispatch(getIndiPost(id));
     if (response.error) {
