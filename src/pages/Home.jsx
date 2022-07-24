@@ -31,7 +31,7 @@ const Home = () => {
           <div className="p-8">
             <div className="m-auto max-w-[1000px]">
               <div className="flex items-center justify-center">
-                <div className="text-xl font-bold">So Empty :(</div>
+                <div className="text-xl font-bold">So Empty 😔</div>
               </div>
             </div>
           </div>
