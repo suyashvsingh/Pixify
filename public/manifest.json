@@ -1,6 +1,6 @@
 {
-  "name": "WeatherApp",
-  "short_name": "WeatherApp",
+  "name": "Pixify",
+  "short_name": "Pixify",
   "theme_color": "#000000",
   "background_color": "#000000",
   "display": "standalone",
