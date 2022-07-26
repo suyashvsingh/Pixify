@@ -5,19 +5,26 @@ import { getUserNameFromUserId } from "../features/pixify/pixifySlice";
 
 const Card = ({ postUserId, imageUrl, title, id }) => {
   const [userName, setUserName] = useState();
+  const [loading, setLoading] = useState(true);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const fetchData = async () => {
+    setLoading(true);
     const response = await dispatch(
       getUserNameFromUserId({ userId: postUserId })
     );
     setUserName(response.payload);
+    setLoading(false);
   };
 
   useEffect(() => {
     fetchData();
   }, []);
+
+  if (loading) {
+    return <></>;
+  }
 
   return (
     <div>

@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchData } from "../features/pixify/pixifySlice";
 import Card from "../components/Card";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 const Home = () => {
   const dispatch = useDispatch();
@@ -59,9 +60,16 @@ const Home = () => {
         <div className="p-8">
           <div className="m-auto max-w-[1000px] ">
             <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4">
+              {/* <InfiniteScroll
+                dataLength={1}
+                next={this.fetchMoreData}
+                hasMore={false}
+                loader={<h4>Loading...</h4>}
+              > */}
               {displayData.map((post) => {
                 return <Card {...post} key={post.id} />;
               })}
+              {/* </InfiniteScroll> */}
             </div>
           </div>
         </div>

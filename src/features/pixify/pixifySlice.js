@@ -16,6 +16,9 @@ import {
   doc,
   updateDoc,
   deleteDoc,
+  query,
+  orderBy,
+  limit,
 } from "firebase/firestore";
 import { v4 } from "uuid";
 
@@ -72,7 +75,9 @@ export const fetchData = createAsyncThunk(
   "pixify/fetchData",
   async (thunkAPI) => {
     try {
-      const querySnapshot = await getDocs(collection(db, "posts"));
+      const postsRef = collection(db, "posts");
+      const q = query(postsRef, limit(4));
+      const querySnapshot = await getDocs(q);
       let data = [];
       querySnapshot.docs.forEach((doc) => {
         data.push({ id: doc.id, ...doc.data() });
