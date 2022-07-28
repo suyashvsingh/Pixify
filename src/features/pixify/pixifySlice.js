@@ -76,10 +76,9 @@ export const fetchData = createAsyncThunk(
   async (thunkAPI) => {
     try {
       const postsRef = collection(db, "posts");
-      const q = query(postsRef, limit(4));
-      const querySnapshot = await getDocs(q);
+      const postsSnap = await getDocs(postsRef);
       let data = [];
-      querySnapshot.docs.forEach((doc) => {
+      postsSnap.docs.forEach((doc) => {
         data.push({ id: doc.id, ...doc.data() });
       });
       return data;
