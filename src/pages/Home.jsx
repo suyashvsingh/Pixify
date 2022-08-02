@@ -1,15 +1,29 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchData } from "../features/pixify/pixifySlice";
 import Card from "../components/Card";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 const Home = () => {
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const [searchText, setSearchText] = useState("");
   const dispatch = useDispatch();
   const { displayData } = useSelector((store) => store.pixify);
 
+  const handleOnClickSearch = (e) => {
+    e.preventDefault();
+    navigate(`/?q=${searchText}`);
+    setSearchText("");
+  };
+
+  const handleOnChange = (e) => {
+    setSearchText(e.target.value);
+  };
+
   useEffect(() => {
-    dispatch(fetchData());
-  }, [dispatch]);
+    dispatch(fetchData({ q: searchParams.get("q") }));
+  }, [dispatch, searchParams]);
 
   if (displayData.length === 0) {
     return (
@@ -17,13 +31,15 @@ const Home = () => {
         <section className="w-full">
           <div className="p-8">
             <div className="w-full m-auto max-w-[700px]">
-              <div>
+              <form onSubmit={(e) => handleOnClickSearch(e)}>
                 <input
                   type="text"
                   placeholder="Search pictures"
                   className="w-full text-sm p-4 rounded-full bg-gradient-to-r from-gray-800 to-slate-900"
+                  value={searchText}
+                  onChange={(e) => handleOnChange(e)}
                 />
-              </div>
+              </form>
             </div>
           </div>
         </section>
@@ -45,13 +61,15 @@ const Home = () => {
       <section className="w-full">
         <div className="p-8">
           <div className="w-full m-auto max-w-[700px]">
-            <div>
+            <form onSubmit={(e) => handleOnClickSearch(e)}>
               <input
                 type="text"
                 placeholder="Search pictures"
-                className="w-full text-sm p-4 rounded-full bg-gradient-to-r from-gray-800 to-slate-900 "
+                className="w-full text-sm p-4 rounded-full bg-gradient-to-r from-gray-800 to-slate-900"
+                value={searchText}
+                onChange={(e) => handleOnChange(e)}
               />
-            </div>
+            </form>
           </div>
         </div>
       </section>

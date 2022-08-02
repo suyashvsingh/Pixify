@@ -16,9 +16,6 @@ import {
   doc,
   updateDoc,
   deleteDoc,
-  query,
-  orderBy,
-  limit,
 } from "firebase/firestore";
 import { v4 } from "uuid";
 
@@ -73,14 +70,22 @@ export const onLogout = createAsyncThunk(
 
 export const fetchData = createAsyncThunk(
   "pixify/fetchData",
-  async (thunkAPI) => {
+  async ({ q }, thunkAPI) => {
     try {
       const postsRef = collection(db, "posts");
       const postsSnap = await getDocs(postsRef);
       let data = [];
-      postsSnap.docs.forEach((doc) => {
-        data.push({ id: doc.id, ...doc.data() });
-      });
+      if (!q) {
+        postsSnap.docs.forEach((doc) => {
+          data.push({ id: doc.id, ...doc.data() });
+        });
+      } else {
+        postsSnap.docs.forEach((doc) => {
+          if (doc.data().title.match(new RegExp(q, "i"))) {
+            data.push({ id: doc.id, ...doc.data() });
+          }
+        });
+      }
       return data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.message);
