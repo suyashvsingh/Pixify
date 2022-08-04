@@ -1,19 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { fetchData } from "../features/pixify/pixifySlice";
+import { fetchData, resetHome } from "../features/pixify/pixifySlice";
 import Card from "../components/Card";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import LoadMore from "../components/LoadMore";
 
 const Home = () => {
-  const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
   const [searchText, setSearchText] = useState("");
   const dispatch = useDispatch();
   const { displayData } = useSelector((store) => store.pixify);
 
   const handleOnClickSearch = (e) => {
     e.preventDefault();
-    navigate(`/?q=${searchText}`);
     setSearchText("");
   };
 
@@ -22,8 +19,11 @@ const Home = () => {
   };
 
   useEffect(() => {
-    dispatch(fetchData({ q: searchParams.get("q") }));
-  }, [dispatch, searchParams]);
+    dispatch(fetchData({ displayData }));
+    return () => {
+      dispatch(resetHome());
+    };
+  }, [dispatch]);
 
   if (displayData.length === 0) {
     return (
@@ -84,6 +84,7 @@ const Home = () => {
           </div>
         </div>
       </section>
+      <LoadMore issuer="Home" />
     </>
   );
 };

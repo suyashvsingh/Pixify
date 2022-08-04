@@ -16,6 +16,10 @@ import {
   doc,
   updateDoc,
   deleteDoc,
+  query,
+  orderBy,
+  startAfter,
+  limit,
 } from "firebase/firestore";
 import { v4 } from "uuid";
 
@@ -37,6 +41,9 @@ const initialState = {
   },
   likedPosts: [],
   postedPosts: [],
+  lastDoc: null,
+  startIdxPostedPosts: 0,
+  startIdxLikedPosts: 0,
   isError: false,
   message: "",
 };
@@ -70,23 +77,20 @@ export const onLogout = createAsyncThunk(
 
 export const fetchData = createAsyncThunk(
   "pixify/fetchData",
-  async ({ q }, thunkAPI) => {
+  async ({ displayData }, thunkAPI) => {
     try {
-      const postsRef = collection(db, "posts");
-      const postsSnap = await getDocs(postsRef);
-      let data = [];
-      if (!q) {
+      if (displayData.length === 0) {
+        const postsRef = collection(db, "posts");
+        const q = query(postsRef, orderBy("title"), limit(4));
+        let data = [];
+        let lastDoc;
+        const postsSnap = await getDocs(q);
         postsSnap.docs.forEach((doc) => {
           data.push({ id: doc.id, ...doc.data() });
+          lastDoc = doc;
         });
-      } else {
-        postsSnap.docs.forEach((doc) => {
-          if (doc.data().title.match(new RegExp(q, "i"))) {
-            data.push({ id: doc.id, ...doc.data() });
-          }
-        });
+        return { data, lastDoc };
       }
-      return data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.message);
     }
@@ -197,18 +201,25 @@ export const getLikedPosts = createAsyncThunk(
   "pixify/getLikedPosts",
   async ({ userId }, thunkAPI) => {
     try {
-      let docRef = await doc(db, "users", userId);
+      let docRef = doc(db, "users", userId);
       let docSnap = await getDoc(docRef);
-      const myPostsIds = docSnap.data().likedPosts;
+      const likedPostsIds = docSnap.data().likedPosts;
       let data = [];
-      for (const id of myPostsIds) {
-        docRef = await doc(db, "posts", id);
+      let count = 0;
+      let i;
+      for (i = 0; i < likedPostsIds.length; i++) {
+        if (count >= 4) {
+          break;
+        }
+        let id = likedPostsIds[i];
+        docRef = doc(db, "posts", id);
         docSnap = await getDoc(docRef);
         if (docSnap.data() !== undefined) {
+          count++;
           data.push({ id: docSnap.id, ...docSnap.data() });
         }
       }
-      return data;
+      return { data, i };
     } catch (error) {
       thunkAPI.rejectWithValue(error.message);
     }
@@ -219,19 +230,25 @@ export const getPostedPosts = createAsyncThunk(
   "pixify/getPostedPosts",
   async ({ userId }, thunkAPI) => {
     try {
-      let docRef = await doc(db, "users", userId);
+      let docRef = doc(db, "users", userId);
       let docSnap = await getDoc(docRef);
       const myPostsIds = docSnap.data().postedPosts;
-
       let data = [];
-      for (const id of myPostsIds) {
-        docRef = await doc(db, "posts", id);
+      let count = 0;
+      let i;
+      for (i = 0; i < myPostsIds.length; i++) {
+        if (count >= 4) {
+          break;
+        }
+        let id = myPostsIds[i];
+        docRef = doc(db, "posts", id);
         docSnap = await getDoc(docRef);
         if (docSnap.data() !== undefined) {
+          count++;
           data.push({ id: docSnap.id, ...docSnap.data() });
         }
       }
-      return data;
+      return { data, i };
     } catch (error) {
       thunkAPI.rejectWithValue(error.message);
     }
@@ -267,6 +284,95 @@ export const deletePost = createAsyncThunk(
   }
 );
 
+export const loadMoreHome = createAsyncThunk(
+  "pixify/loadMoreHome",
+  async ({ lastDoc }) => {
+    try {
+      const postsRef = collection(db, "posts");
+      const q = query(
+        postsRef,
+        orderBy("title"),
+        limit(4),
+        startAfter(lastDoc)
+      );
+      let data = [];
+      let lastDocCurrent;
+      const postsSnap = await getDocs(q);
+      postsSnap.docs.forEach((doc) => {
+        data.push({ id: doc.id, ...doc.data() });
+        lastDocCurrent = doc;
+      });
+      return { data, lastDocCurrent };
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  }
+);
+
+export const loadMorePostedPosts = createAsyncThunk(
+  "pixify/loadMorePostedPosts",
+  async ({ userId, startIdxPostedPosts }) => {
+    try {
+      let docRef = doc(db, "users", userId);
+      let docSnap = await getDoc(docRef);
+      const myPostsIds = docSnap.data().postedPosts;
+      let data = [];
+      let count = 0;
+      let i;
+      for (i = startIdxPostedPosts; i < myPostsIds.length; i++) {
+        if (count >= 4) {
+          break;
+        }
+        let id = myPostsIds[i];
+        docRef = doc(db, "posts", id);
+        docSnap = await getDoc(docRef);
+        if (docSnap.data() !== undefined) {
+          count++;
+          data.push({ id: docSnap.id, ...docSnap.data() });
+        }
+      }
+      if (count === 0) {
+        throw new Error("Nothing to show more");
+      }
+      return { data, i };
+    } catch (error) {
+      thunkAPI.rejectWithValue(error.message);
+    }
+  }
+);
+
+export const loadMoreLikedPosts = createAsyncThunk(
+  "pixify/loadMoreLikedPosts",
+  async ({ userId, startIdxLikedPosts }) => {
+    try {
+      let docRef = doc(db, "users", userId);
+      let docSnap = await getDoc(docRef);
+      const likedPostsIds = docSnap.data().likedPosts;
+      let data = [];
+      let count = 0;
+      let i;
+      for (i = startIdxLikedPosts; i < likedPostsIds.length; i++) {
+        if (count >= 4) {
+          break;
+        }
+        let id = likedPostsIds[i];
+        docRef = doc(db, "posts", id);
+        docSnap = await getDoc(docRef);
+        if (docSnap.data() !== undefined) {
+          count++;
+          data.push({ id: docSnap.id, ...docSnap.data() });
+        }
+      }
+      if (count === 0) {
+        throw new Error("Nothing to show more");
+      }
+      return { data, i };
+    } catch (error) {
+      thunkAPI.rejectWithValue(error.message);
+    }
+  }
+);
+
 const pixifySlice = createSlice({
   name: "pixifySlice",
   initialState,
@@ -277,6 +383,10 @@ const pixifySlice = createSlice({
       state.currentPost.postUserId = null;
       state.currentPost.likedBy = null;
       state.currentPost.likedByLoggedInUser = false;
+    },
+    resetHome: (state) => {
+      state.displayData = [];
+      state.lastDoc = null;
     },
   },
   extraReducers: {
@@ -301,7 +411,7 @@ const pixifySlice = createSlice({
       state.message = payload;
     },
 
-    [onLogout.fulfilled]: (state, action) => {
+    [onLogout.fulfilled]: (state) => {
       state.isLoggedIn = false;
       state.userName = null;
       state.userId = null;
@@ -323,7 +433,10 @@ const pixifySlice = createSlice({
     },
 
     [fetchData.fulfilled]: (state, { payload }) => {
-      state.displayData = payload;
+      if (payload) {
+        state.displayData = payload.data;
+        state.lastDoc = payload.lastDoc;
+      }
       state.message = "";
       state.isError = false;
     },
@@ -336,9 +449,53 @@ const pixifySlice = createSlice({
       state.message = payload;
     },
 
+    [loadMoreHome.fulfilled]: (state, { payload }) => {
+      state.displayData = [...state.displayData, ...payload.data];
+      state.lastDoc = payload.lastDocCurrent;
+    },
+    [loadMoreHome.pending]: (state) => {
+      state.isError = false;
+      state.message = "";
+    },
+    [loadMoreHome.rejected]: (state) => {
+      state.isError = true;
+      state.message = "Nothing to show more";
+    },
+
+    [loadMorePostedPosts.fulfilled]: (state, { payload }) => {
+      state.postedPosts = [...state.postedPosts, ...payload.data];
+      state.startIdxPostedPosts = payload.i;
+      state.message = "";
+      state.isError = false;
+    },
+    [loadMorePostedPosts.pending]: (state) => {
+      state.isError = false;
+      state.message = "";
+    },
+    [loadMorePostedPosts.rejected]: (state) => {
+      state.isError = true;
+      state.message = "Nothing to show more";
+    },
+
+    [loadMoreLikedPosts.fulfilled]: (state, { payload }) => {
+      state.likedPosts = [...state.likedPosts, ...payload.data];
+      state.startIdxLikedPosts = payload.i;
+      state.message = "";
+      state.isError = false;
+    },
+    [loadMoreLikedPosts.pending]: (state) => {
+      state.isError = false;
+      state.message = "";
+    },
+    [loadMoreLikedPosts.rejected]: (state) => {
+      state.isError = true;
+      state.message = "Nothing to show more";
+    },
+
     [onPost.fulfilled]: (state) => {
       state.isError = false;
       state.message = "Post successfull";
+      state.displayData = [];
     },
     [onPost.pending]: (state) => {
       state.isError = false;
@@ -378,7 +535,8 @@ const pixifySlice = createSlice({
     },
 
     [getLikedPosts.fulfilled]: (state, { payload }) => {
-      state.likedPosts = payload;
+      state.likedPosts = payload.data;
+      state.startIdxLikedPosts = payload.i;
       state.message = "";
       state.isError = false;
     },
@@ -392,7 +550,8 @@ const pixifySlice = createSlice({
     },
 
     [getPostedPosts.fulfilled]: (state, { payload }) => {
-      state.postedPosts = payload;
+      state.postedPosts = payload.data;
+      state.startIdxPostedPosts = payload.i;
       state.message = "";
       state.isError = false;
     },
@@ -417,7 +576,7 @@ const pixifySlice = createSlice({
       state.isError = true;
     },
 
-    [deletePost.fulfilled]: (state, { payload }) => {
+    [deletePost.fulfilled]: (state) => {
       state.isError = false;
       state.message = "Post deleted";
     },
@@ -432,6 +591,6 @@ const pixifySlice = createSlice({
   },
 });
 
-export const { resetCurrPost } = pixifySlice.actions;
+export const { resetCurrPost, resetHome } = pixifySlice.actions;
 
 export default pixifySlice.reducer;

@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { getLikedPosts } from "../features/pixify/pixifySlice";
 import ClipLoader from "react-spinners/ClipLoader";
 import Card from "../components/Card";
+import LoadMore from "../components/LoadMore";
 
 const LikedPosts = () => {
   const [loading, setLoading] = useState(true);
@@ -19,7 +20,6 @@ const LikedPosts = () => {
     const fetch = async () => {
       await fetchlikedPosts();
     };
-
     fetch();
   }, []);
 
@@ -54,20 +54,23 @@ const LikedPosts = () => {
   }
 
   return (
-    <section className="w-full">
-      <div className="p-8 pt-2">
-        <div className="m-auto max-w-[1000px] ">
-          <div className="mb-8">
-            <p className="font-bold text-xl">Liked Posts</p>
-          </div>
-          <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4">
-            {likedPosts.map((post) => {
-              return <Card {...post} key={post.id} />;
-            })}
+    <>
+      <section className="w-full">
+        <div className="p-8 pt-2">
+          <div className="m-auto max-w-[1000px] ">
+            <div className="mb-8">
+              <p className="font-bold text-xl">Liked Posts</p>
+            </div>
+            <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4">
+              {likedPosts.map((post) => {
+                return <Card {...post} key={post.id} />;
+              })}
+            </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+      <LoadMore issuer="LikedPosts" />
+    </>
   );
 };
 
