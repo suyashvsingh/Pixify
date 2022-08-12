@@ -52,7 +52,7 @@ export const onLogin = createAsyncThunk("pixify/onLogin", async (thunkAPI) => {
   try {
     const response = await signInWithPopup(auth, provider);
     if (getAdditionalUserInfo(response).isNewUser) {
-      const docRef = await doc(db, "users", auth.currentUser.uid);
+      const docRef = doc(db, "users", auth.currentUser.uid);
       await setDoc(docRef, {
         userName: auth.currentUser.displayName,
         likedPosts: [],
@@ -77,20 +77,18 @@ export const onLogout = createAsyncThunk(
 
 export const fetchData = createAsyncThunk(
   "pixify/fetchData",
-  async ({ displayData }, thunkAPI) => {
+  async (thunkAPI) => {
     try {
-      if (displayData.length === 0) {
-        const postsRef = collection(db, "posts");
-        const q = query(postsRef, orderBy("title"), limit(4));
-        let data = [];
-        let lastDoc;
-        const postsSnap = await getDocs(q);
-        postsSnap.docs.forEach((doc) => {
-          data.push({ id: doc.id, ...doc.data() });
-          lastDoc = doc;
-        });
-        return { data, lastDoc };
-      }
+      const postsRef = collection(db, "posts");
+      const q = query(postsRef, orderBy("title"), limit(4));
+      let data = [];
+      let lastDoc;
+      const postsSnap = await getDocs(q);
+      postsSnap.docs.forEach((doc) => {
+        data.push({ id: doc.id, ...doc.data() });
+        lastDoc = doc;
+      });
+      return { data, lastDoc };
     } catch (error) {
       return thunkAPI.rejectWithValue(error.message);
     }
@@ -332,7 +330,7 @@ export const loadMorePostedPosts = createAsyncThunk(
         }
       }
       if (count === 0) {
-        throw new Error("Nothing to show more");
+        throw new Error("Nothing more to display");
       }
       return { data, i };
     } catch (error) {
@@ -364,7 +362,7 @@ export const loadMoreLikedPosts = createAsyncThunk(
         }
       }
       if (count === 0) {
-        throw new Error("Nothing to show more");
+        throw new Error("Nothing more to display");
       }
       return { data, i };
     } catch (error) {
@@ -459,7 +457,7 @@ const pixifySlice = createSlice({
     },
     [loadMoreHome.rejected]: (state) => {
       state.isError = true;
-      state.message = "Nothing to show more";
+      state.message = "Nothing more to display";
     },
 
     [loadMorePostedPosts.fulfilled]: (state, { payload }) => {
@@ -474,7 +472,7 @@ const pixifySlice = createSlice({
     },
     [loadMorePostedPosts.rejected]: (state) => {
       state.isError = true;
-      state.message = "Nothing to show more";
+      state.message = "Nothing more to display";
     },
 
     [loadMoreLikedPosts.fulfilled]: (state, { payload }) => {
@@ -489,7 +487,7 @@ const pixifySlice = createSlice({
     },
     [loadMoreLikedPosts.rejected]: (state) => {
       state.isError = true;
-      state.message = "Nothing to show more";
+      state.message = "Nothing more to display";
     },
 
     [onPost.fulfilled]: (state) => {
