@@ -1,7 +1,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/github_username/repo_name">
-    <img src="frontend/src/img/amazon_logo.png" alt="Logo" height="80">
+    <img src="https://raw.githubusercontent.com/suyashvsingh/Pixify/master/public/icon.png" alt="Logo" height="80">
   </a>
 
 <h3 align="center">Pixify</h3>
