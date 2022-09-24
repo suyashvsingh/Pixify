@@ -7,7 +7,7 @@ import {
 } from "../features/pixify/pixifySlice";
 import ClipLoader from "react-spinners/ClipLoader";
 
-const LoadMore = ({ issuer }) => {
+const LoadMore = ({ issuer, search }) => {
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
   const { lastDoc, userId, startIdxPostedPosts, startIdxLikedPosts } =
@@ -16,7 +16,7 @@ const LoadMore = ({ issuer }) => {
   const handleOnClickLoadMore = async () => {
     setLoading(true);
     if (issuer === "Home") {
-      await dispatch(loadMoreHome({ lastDoc }));
+      await dispatch(loadMoreHome({ lastDoc, search }));
     }
     if (issuer === "MyPosts") {
       await dispatch(loadMorePostedPosts({ userId, startIdxPostedPosts }));

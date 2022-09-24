@@ -20,6 +20,7 @@ import {
   orderBy,
   startAfter,
   limit,
+  where,
 } from "firebase/firestore";
 import { v4 } from "uuid";
 
@@ -77,10 +78,16 @@ export const onLogout = createAsyncThunk(
 
 export const fetchData = createAsyncThunk(
   "pixify/fetchData",
-  async (thunkAPI) => {
+  async (search, thunkAPI) => {
     try {
+      console.log(search);
       const postsRef = collection(db, "posts");
-      const q = query(postsRef, orderBy("title"), limit(4));
+      let q;
+      if (search) {
+        q = query(postsRef, limit(4), where("title", "==", search));
+      } else {
+        q = query(postsRef, orderBy("title"), limit(4));
+      }
       let data = [];
       let lastDoc;
       const postsSnap = await getDocs(q);
@@ -284,15 +291,20 @@ export const deletePost = createAsyncThunk(
 
 export const loadMoreHome = createAsyncThunk(
   "pixify/loadMoreHome",
-  async ({ lastDoc }) => {
+  async ({ lastDoc, search }) => {
     try {
       const postsRef = collection(db, "posts");
-      const q = query(
-        postsRef,
-        orderBy("title"),
-        limit(4),
-        startAfter(lastDoc)
-      );
+      let q;
+      if (search) {
+        q = query(
+          postsRef,
+          limit(4),
+          startAfter(lastDoc),
+          where("title", "==", search)
+        );
+      } else {
+        q = query(postsRef, orderBy("title"), limit(4), startAfter(lastDoc));
+      }
       let data = [];
       let lastDocCurrent;
       const postsSnap = await getDocs(q);
