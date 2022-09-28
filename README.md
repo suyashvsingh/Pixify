@@ -44,7 +44,7 @@ Follow the steps below to run the app in the local environment.
 2. Run a container of the image
 
    ```sh
-   docker run -d -p 3000:3000 --name pixify1 pixify
+   docker run -d -p 3000:3000 --name pixify1 suyashvsingh/pixify
    ```
    Application will start running at http://localhost:3000
 
