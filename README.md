@@ -11,10 +11,6 @@
     <br />
 </div>
 
-## Demo
-
-- <a href='https://svs-pixify.vercel.app/' target="_blank">Hosted on Vercel</a>
-
 ## About The Project
 
 [![Product Name Screen Shot][product-screenshot]](https://example.com)
