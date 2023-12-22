@@ -3,13 +3,13 @@
 @tailwind utilities;
 
 @layer base {
-  body {
-    @apply font-[poppins];
-    @apply text-gray-300;
-  }
-  li {
-    @apply p-1 pl-0 font-normal text-base;
-  }
+    body {
+        @apply font-[poppins];
+        @apply text-gray-300;
+    }
+    li {
+        @apply p-1 pl-0 font-normal text-base;
+    }
 }
 
 input,
@@ -18,18 +18,18 @@ button,
 select,
 div,
 a {
-  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 
 html {
-  overflow: scroll;
-  overflow-x: hidden;
+    overflow: scroll;
+    overflow-x: hidden;
 }
 ::-webkit-scrollbar {
-  width: 0;
-  background: transparent;
+    width: 0;
+    background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #ff0000;
+    background: #ff0000;
 }

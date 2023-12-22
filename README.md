@@ -33,20 +33,21 @@ Follow the steps below to run the app in the local environment.
 
 1. Pull the image
 
-   ```sh
-   docker pull suyashvsingh/pixify
-   ```
+    ```sh
+    docker pull suyashvsingh/pixify
+    ```
 
 2. Run a container of the image
 
-   ```sh
-   docker run -d -p 3000:3000 --name pixify1 suyashvsingh/pixify
-   ```
-   Application will start running at http://localhost:3000
+    ```sh
+    docker run -d -p 3000:3000 --name pixify1 suyashvsingh/pixify
+    ```
+
+    Application will start running at http://localhost:3000
 
 ### Prerequisites
 
-- npm
+-   npm
 
 ```sh
 npm install npm@latest -g
@@ -55,20 +56,20 @@ npm install npm@latest -g
 ### Installation
 
 1. Clone the repo
-   ```sh
-   git clone https://github.com/suyashvsingh/Pixify
-   ```
+    ```sh
+    git clone https://github.com/suyashvsingh/Pixify
+    ```
 2. Install NPM packages
 
-   ```sh
-   npm install
-   ```
+    ```sh
+    npm install
+    ```
 
 3. Start the application
-   ```sh
-   npm run dev
-   ```
-   Application will start running at http://localhost:3000
+    ```sh
+    npm run dev
+    ```
+    Application will start running at http://localhost:3000
 
 ## Features
 
