@@ -29,22 +29,6 @@ Users can create an account using their Google Account, can post and like images
 
 Follow the steps below to run the app in the local environment.
 
-### Use through docker image
-
-1. Pull the image
-
-    ```sh
-    docker pull suyashvsingh/pixify
-    ```
-
-2. Run a container of the image
-
-    ```sh
-    docker run -d -p 3000:3000 --name pixify1 suyashvsingh/pixify
-    ```
-
-    Application will start running at http://localhost:3000
-
 ### Prerequisites
 
 -   npm
